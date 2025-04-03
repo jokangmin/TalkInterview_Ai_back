@@ -1,5 +1,7 @@
 package com.example.demo.user.service;
 
+import java.util.Map;
+
 import com.example.demo.user.dto.UserDTO;
 
 public interface UserService {
@@ -8,6 +10,8 @@ public interface UserService {
 
 	public int insert(UserDTO userDTO);
 
-	public UserDTO login(String userId, String userPassword);
+	public Map<String, Object> login(String userId, String userPassword);
+
+	void logout(String refreshToken);
 	
 }

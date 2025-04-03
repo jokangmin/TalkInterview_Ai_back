@@ -51,4 +51,9 @@ public class UserEntity {
         
         return entity;
     }
+
+	public Object isAdmin() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
