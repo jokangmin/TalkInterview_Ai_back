@@ -13,5 +13,8 @@ public interface UserService {
 	public Map<String, Object> login(String userId, String userPassword);
 
 	void logout(String refreshToken);
+
+	public void saveFavoriteQuestion(int memberId, String interviewQ, String answer, String feedback, String category,
+			String jobTitle);
 	
 }

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.demo.user.dto.UserDTO;
+import com.example.demo.user.entity.FavoriteQuestion;
 import com.example.demo.user.entity.UserEntity;
+import com.example.demo.user.repository.FavoriteQuestionRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
 import com.example.demo.util.JwtUtil;
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
+    @Autowired
+    private FavoriteQuestionRepository favoriteQuestionRepository;
+
     @Autowired
     private JwtUtil jwtUtil;
     
@@ -79,4 +84,17 @@ public class UserServiceImpl implements UserService {
             jwtUtil.invalidateToken(refreshToken);
         }
     }
+
+	@Override
+	public void saveFavoriteQuestion(int memberId, String interviewQ, String answer, String feedback, String category,
+			String jobTitle) {
+		favoriteQuestionRepository.save(FavoriteQuestion.builder()
+		        .memberId(memberId)
+		        .interviewQ(interviewQ)
+		        .answer(answer)
+		        .feedback(feedback)
+		        .category(category)
+		        .jobTitle(jobTitle)
+		        .build());
+	}
 }
