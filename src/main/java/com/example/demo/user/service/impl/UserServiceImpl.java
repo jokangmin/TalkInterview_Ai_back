@@ -85,16 +85,27 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-	@Override
-	public void saveFavoriteQuestion(int memberId, String interviewQ, String answer, String feedback, String category,
-			String jobTitle) {
-		favoriteQuestionRepository.save(FavoriteQuestion.builder()
-		        .memberId(memberId)
-		        .interviewQ(interviewQ)
-		        .answer(answer)
-		        .feedback(feedback)
-		        .category(category)
-		        .jobTitle(jobTitle)
-		        .build());
-	}
+    @Override
+    public void saveFavoriteQuestion(int memberId, String interviewQ, String answer, String feedback, String category,
+            String jobTitle) {
+    	
+    	// 중복 여부 확인
+        boolean exists = favoriteQuestionRepository.existsByMemberIdAndInterviewQ(memberId, interviewQ);
+        
+        if (exists) {
+            throw new RuntimeException("이미 해당 질문이 저장되어 있습니다.");
+        }
+    	
+        FavoriteQuestion saved = favoriteQuestionRepository.save(FavoriteQuestion.builder()
+            .memberId(memberId)
+            .interviewQ(interviewQ)
+            .answer(answer)
+            .feedback(feedback)
+            .category(category)
+            .jobTitle(jobTitle)
+            .build());
+            
+        System.out.println("🔥 저장된 질문 ID: " + saved.getId()); // 실제 저장됐는지 확인용
+    }
+
 }
