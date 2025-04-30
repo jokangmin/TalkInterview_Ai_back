@@ -1,5 +1,7 @@
 package com.example.demo.user.entity;
 
+import java.io.Serializable;
+
 import com.example.demo.user.dto.UserDTO;
 
 import jakarta.persistence.Column;
@@ -16,7 +18,7 @@ import lombok.Data;
 @lombok.NoArgsConstructor
 @Entity
 @Table(name = "member_table")
-public class UserEntity {
+public class UserEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

@@ -1,5 +1,6 @@
 package com.example.demo.user.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.user.dto.UserDTO;
+import com.example.demo.user.entity.FavoriteQuestion;
+import com.example.demo.user.entity.UserEntity;
+import com.example.demo.user.repository.FavoriteQuestionRepository;
+import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
@@ -17,6 +25,10 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FavoriteQuestionRepository favoriteQuestionRepository;
+
     
     // 회원가입 시 ID 중복 체크
     @GetMapping("/idCheck")
@@ -53,25 +65,27 @@ public class UserController {
     
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
-        System.out.println("로그인 요청: " + userDTO);
-
+    public ResponseEntity<?> login(@RequestBody UserDTO userDTO, HttpServletRequest request) {
         if (userDTO.getUserId() == null || userDTO.getUserPassword() == null) {
-            System.out.println("❌ 요청 데이터가 잘못되었습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"잘못된 요청입니다.\"}");
         }
 
         Map<String, Object> loginResult = userService.login(userDTO.getUserId(), userDTO.getUserPassword());
 
         if (loginResult != null) {
-            System.out.println("✅ 로그인 성공: " + loginResult.get("userId"));
+            // ✅ 세션에 로그인한 사용자 저장
+            HttpSession session = request.getSession(true);
+            UserEntity loginUser = (UserEntity) loginResult.get("userEntity");
+            session.setAttribute("user", loginUser);
+
             return ResponseEntity.ok(loginResult);
         }
 
-        System.out.println("❌ 로그인 실패: 아이디 또는 비밀번호 불일치");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("{\"error\": \"아이디 또는 비밀번호가 일치하지 않습니다.\"}");
     }
+
+
     
     //질문 즐겨찾기 저장
     @PostMapping("/favorite")
@@ -102,6 +116,21 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("질문 저장 중 오류 발생: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/myQuestions")
+    public ResponseEntity<?> getMyQuestions(HttpServletRequest request) {
+        // 세션에서 로그인된 사용자 정보 추출
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+
+        UserEntity member = (UserEntity) session.getAttribute("user");
+
+        List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findByMemberId(member.getId());
+        return ResponseEntity.ok(favoriteQuestions);
     }
 
 
