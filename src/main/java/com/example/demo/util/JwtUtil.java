@@ -28,16 +28,16 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String userId, Long id, boolean isAdmin) {
+    public String generateAccessToken(String userId, Long id) {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("id", id)
-                .claim("isAdmin", isAdmin)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public String generateRefreshToken(String userId, Long id) {
         return Jwts.builder()

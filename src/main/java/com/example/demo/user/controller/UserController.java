@@ -25,6 +25,9 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private FavoriteQuestionRepository favoriteQuestionRepository;
@@ -67,22 +70,21 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO userDTO, HttpServletRequest request) {
         if (userDTO.getUserId() == null || userDTO.getUserPassword() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"잘못된 요청입니다.\"}");
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다."));
         }
 
         Map<String, Object> loginResult = userService.login(userDTO.getUserId(), userDTO.getUserPassword());
 
         if (loginResult != null) {
-            // ✅ 세션에 로그인한 사용자 저장
             HttpSession session = request.getSession(true);
-            UserEntity loginUser = (UserEntity) loginResult.get("userEntity");
+            UserEntity loginUser = userRepository.findByUserId(userDTO.getUserId());
             session.setAttribute("user", loginUser);
 
             return ResponseEntity.ok(loginResult);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("{\"error\": \"아이디 또는 비밀번호가 일치하지 않습니다.\"}");
+                .body(Map.of("error", "아이디 또는 비밀번호가 일치하지 않습니다."));
     }
 
 

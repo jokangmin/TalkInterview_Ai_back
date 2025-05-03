@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByUserId(userId);
         
         if (userEntity == null || !passwordEncoder.matches(userPassword, userEntity.getUserPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            return null;
         }
         
         return generateJwtResponse(userEntity);
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     
     private Map<String, Object> generateJwtResponse(UserEntity user) {
         Boolean isAdmin = user.isAdmin() instanceof Boolean ? (Boolean) user.isAdmin() : false;
-        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getId().longValue(), isAdmin);
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getId().longValue());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId().longValue());
         
         Map<String, Object> result = new HashMap<>();
