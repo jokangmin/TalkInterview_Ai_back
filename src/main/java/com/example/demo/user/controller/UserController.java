@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.FavoriteQuestion;
@@ -68,24 +69,21 @@ public class UserController {
     
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
         if (userDTO.getUserId() == null || userDTO.getUserPassword() == null) {
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다."));
         }
 
         Map<String, Object> loginResult = userService.login(userDTO.getUserId(), userDTO.getUserPassword());
 
         if (loginResult != null) {
-            HttpSession session = request.getSession(true);
-            UserEntity loginUser = userRepository.findByUserId(userDTO.getUserId());
-            session.setAttribute("user", loginUser);
-
-            return ResponseEntity.ok(loginResult);
+            return ResponseEntity.ok(loginResult); // JWT 포함된 응답 반환
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "아이디 또는 비밀번호가 일치하지 않습니다."));
     }
+
 
 
     
@@ -121,19 +119,25 @@ public class UserController {
     }
 
     @GetMapping("/myQuestions")
-    public ResponseEntity<?> getMyQuestions(HttpServletRequest request) {
-        // 세션에서 로그인된 사용자 정보 추출
-        HttpSession session = request.getSession(false);
-
-        if (session == null || session.getAttribute("user") == null) {
+    public ResponseEntity<?> getMyQuestions(Authentication authentication) {
+        System.out.println("🔐 인증 객체: " + authentication);
+        
+        if (authentication == null || authentication.getPrincipal() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
         }
 
-        UserEntity member = (UserEntity) session.getAttribute("user");
+        UserEntity member = (UserEntity) authentication.getPrincipal();
+        System.out.println("🙋 인증된 사용자: " + member.getUserId());
+        System.out.println("인증된 아이디: " + member.getId());
 
         List<FavoriteQuestion> favoriteQuestions = favoriteQuestionRepository.findByMemberId(member.getId());
+        System.out.println("*******");
+        System.out.println(favoriteQuestions);
+        System.out.println("*******");
         return ResponseEntity.ok(favoriteQuestions);
     }
+
+
 
 
 }
