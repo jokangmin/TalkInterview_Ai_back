@@ -137,7 +137,38 @@ public class UserController {
         return ResponseEntity.ok(favoriteQuestions);
     }
 
+    // 즐겨찾기 질문 삭제
+    @DeleteMapping("/myQuestions/{id}")
+    public ResponseEntity<?> deleteFavoriteQuestion(@PathVariable("id") Integer id, Authentication authentication) {
+        System.out.println("🗑️ 삭제 요청 들어옴 - 질문 ID: " + id);
 
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+
+        UserEntity member = (UserEntity) authentication.getPrincipal();
+        Integer memberId = member.getId();
+
+        // 해당 질문이 로그인한 사용자 소유인지 확인
+        FavoriteQuestion question = favoriteQuestionRepository.findById(id).orElse(null);
+        if (question == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 질문을 찾을 수 없습니다.");
+        }
+
+        if (!question.getMemberId().equals(memberId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+        }
+
+        try {
+            favoriteQuestionRepository.deleteById(id);
+            System.out.println("✅ 삭제 성공 - 질문 ID: " + id);
+            return ResponseEntity.ok("질문이 삭제되었습니다.");
+        } catch (Exception e) {
+            System.out.println("❌ 삭제 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("질문 삭제 중 오류가 발생했습니다.");
+        }
+    }
 
 
 }
