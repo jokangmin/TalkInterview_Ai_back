@@ -1,11 +1,8 @@
-# 1단계: 빌드
-FROM gradle:7.6.0-jdk17 AS builder
-WORKDIR /app
-COPY --chown=gradle:gradle . .
-RUN gradle clean build -x test --no-daemon --no-build-cache
-
-# 2단계: 실행
+# 실행만 담당하는 이미지
 FROM eclipse-temurin:17-jdk-jammy
-WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# 로컬에서 빌드된 JAR 복사 (파일명 정확히 명시)
+COPY build/libs/TalkTalkInterview-0.0.1-SNAPSHOT.jar app.jar
+
+# 실행
+ENTRYPOINT ["java", "-jar", "/app.jar"]
