@@ -6,3 +6,8 @@ services:
     region: singapore
     branch: master
     autoDeploy: true
+    envVars:
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
