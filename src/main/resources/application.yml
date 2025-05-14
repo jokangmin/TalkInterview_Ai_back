@@ -10,9 +10,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/AiTalkInterview?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://kangmin-ai-talk-database.c5ucyik0i76l.ap-northeast-2.rds.amazonaws.com:3306/TalkInterview?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
-    password: wh51255125
+    password: Wh51253625!
 
   jpa:
     hibernate:
@@ -20,7 +20,9 @@ spring:
     show-sql: true  # SQL 로그 출력
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        show_sql: true
 
 jwt:
   secret: "b4fb233d6f0b795ab1be99927d9ccbc2e0a0d7c7e3ca736d3ee07b2f4bb3e093"
