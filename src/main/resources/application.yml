@@ -9,10 +9,10 @@ spring:
     port: 8080
 
   datasource:
-    url: jdbc:mysql://switchyard.proxy.rlwy.net:16413/railway?serverTimezone=UTC&characterEncoding=UTF-8
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/AiTalkInterview?serverTimezone=Asia/Seoul
+    username: root
+    password: wh51255125
 
   jpa:
     hibernate:
@@ -20,9 +20,7 @@ spring:
     show-sql: true  # SQL 로그 출력
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect # 변경된 부분
-        format_sql: true
-
+        dialect: org.hibernate.dialect.MySQLDialect
 
 jwt:
   secret: "b4fb233d6f0b795ab1be99927d9ccbc2e0a0d7c7e3ca736d3ee07b2f4bb3e093"
