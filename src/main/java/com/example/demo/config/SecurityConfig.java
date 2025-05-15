@@ -39,7 +39,7 @@ public class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션 비활성화
             .and()
             .authorizeHttpRequests()
-                .requestMatchers("/api/user/login", "/api/user/join", "/api/user/idCheck").permitAll()
+                .requestMatchers("/", "/api/user/login", "/api/user/join", "/api/user/idCheck").permitAll()
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
