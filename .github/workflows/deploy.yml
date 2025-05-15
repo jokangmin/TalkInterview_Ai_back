@@ -1,0 +1,28 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "main", "master" ]  # 원하는 브랜치에 push될 때만 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd ~/TalkInterview_Ai_back
+          git pull origin master
+          ./gradlew clean build -x test
+          pkill -f 'TalkTalkInterview' || true
+          nohup java -jar build/libs/TalkTalkInterview-0.0.1-SNAPSHOT.jar > nohup.out 2>&1 &
+        EOF
