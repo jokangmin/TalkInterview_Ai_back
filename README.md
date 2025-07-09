@@ -36,6 +36,7 @@
 | **Backend**  | Spring Boot, MySQL, JWT |
 | **API**      | OpenAI GPT API |
 
+
 ---
 
 ## 🔥 **배울 점**
